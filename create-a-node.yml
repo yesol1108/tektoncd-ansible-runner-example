@@ -1,0 +1,84 @@
+- hosts: localhost
+  connection: local
+  collections:
+    - community.kubernetes
+  tasks:
+    - name: Create a new Node
+      k8s:
+        state: present
+        resource_definition: |
+          apiVersion: machine.openshift.io/v1beta1
+          kind: MachineSet
+          metadata:
+            annotations:
+              machine.openshift.io/GPU: "0"
+              machine.openshift.io/memoryMb: "65536"
+              machine.openshift.io/vCPU: "16"
+            generation: 1
+            labels:
+              machine.openshift.io/cluster-api-cluster: ocp410-h76gw
+            name: ocp410-ansilbe-create-2a
+            namespace: openshift-machine-api
+          spec:
+            replicas: 0
+            selector:
+              matchLabels:
+                machine.openshift.io/cluster-api-cluster: ocp410-h76gw
+                machine.openshift.io/cluster-api-machineset: ocp410-ansible-create-2a
+            template:
+              metadata:
+                labels:
+                  machine.openshift.io/cluster-api-cluster: ocp410-h76gw
+                  machine.openshift.io/cluster-api-machine-role: worker
+                  machine.openshift.io/cluster-api-machine-type: worker
+                  machine.openshift.io/cluster-api-machineset: ocp410-ansible-create-2a
+              spec:
+                metadata: {}
+                providerSpec:
+                  value:
+                    ami:
+                      id: ami-0a17e9bb4f03e5a91
+                    apiVersion: awsproviderconfig.openshift.io/v1beta1
+                    blockDevices:
+                    - ebs:
+                        encrypted: true
+                        iops: 0
+                        kmsKey:
+                          arn: ""
+                        volumeSize: 120
+                        volumeType: gp3
+                    credentialsSecret:
+                      name: aws-cloud-credentials
+                    deviceIndex: 0
+                    iamInstanceProfile:
+                      id: ocp410-h76gw-worker-profile
+                    instanceType: m5.4xlarge
+                    kind: AWSMachineProviderConfig
+                    metadata:
+                      creationTimestamp: null
+                    placement:
+                      availabilityZone: ap-northeast-2a
+                      region: ap-northeast-2
+                    securityGroups:
+                    - filters:
+                      - name: tag:Name
+                        values:
+                        - ocp410-h76gw-worker-sg
+                    subnet:
+                      filters:
+                      - name: tag:Name
+                        values:
+                        - ocp410-h76gw-private-ap-northeast-2a
+                    tags:
+                    - name: kubernetes.io/cluster/ocp410-h76gw
+                      value: owned
+                    userDataSecret:
+                      name: worker-user-data
+          status:
+            availableReplicas: 1
+            fullyLabeledReplicas: 1
+            observedGeneration: 1
+            readyReplicas: 1
+            replicas: 1
+                  wait: yes
+                register: create_node
