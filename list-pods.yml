@@ -1,0 +1,10 @@
+- hosts: localhost
+  connection: local
+  collections:
+    - community.kubernetes
+  tasks:
+    - name: create empty file
+      file:
+        path: "/home/test_file.txt"
+        state: touch
+      become: yes
