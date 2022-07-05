@@ -11,7 +11,7 @@
           kind: Service
           metadata:
             name: helloworld
-            namespace: funstuff
+            namespace: ansible-ees
           spec:
             selector:
               app: helloworld
@@ -23,7 +23,7 @@
     - name: Get the Service
       k8s_info:
         kind: Service
-        namespace: funstuff
+        namespace: ansible-ees
       register: funstuff_service_list
     - name: Log Service Details
       debug:
